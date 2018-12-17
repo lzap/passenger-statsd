@@ -1,0 +1,16 @@
+#!/bin/bash
+CMD=/usr/bin/passenger-status
+TMP=/tmp/passenger-status-statsd.xml
+
+$CMD --xml 2>/dev/null 1>$TMP
+process_count=($(grep -oP '(?<=process_count>)[^<]+' $TMP | head -n1))
+max=($(grep -oP '(?<=max>)[^<]+' $TMP | head -n1))
+utilization=($(grep -oP '(?<=utilization>)[^<]+' $TMP | head -n1))
+get_wait_list_size=($(grep -oP '(?<=get_wait_list_size>)[^<]+' $TMP | head -n1))
+
+cat <<EOM | nc -w 1 -u localhost 8125
+passenger_status.total.process_count:$process_count|g
+passenger_status.total.max:$max|g
+passenger_status.total.utilization:$utilization|g
+passenger_status.total.get_wait_list_size:$get_wait_list_size|g
+EOM

@@ -2,7 +2,7 @@
 CMD=/usr/bin/passenger-status
 TMP=/tmp/passenger-status-statsd.xml
 
-$CMD --xml 2>/dev/null 1>$TMP
+$CMD --show=xml 2>/dev/null 1>$TMP
 process_count=($(grep -oP '(?<=process_count>)[^<]+' $TMP | head -n1))
 max=($(grep -oP '(?<=max>)[^<]+' $TMP | head -n1))
 utilization=($(grep -oP '(?<=utilization>)[^<]+' $TMP | head -n1))
